@@ -28,8 +28,10 @@
                 <MenuItem Header="GLevels_on_Row" Name="GL_ROW_ON" IsCheckable="True" Click="GL_ROW_ON_Click" IsEnabled="False"/>
                 <MenuItem Header="Invert" Click="Invert_Click"/>
                 <MenuItem Header="Modificare Contrast" Click="Contrast_Click"/>
+                <MenuItem Header="Binarizare2P" Click="Binarizare2P_Click"/>
+                <MenuItem Header="BinarizareIntermeans" Click="BinarizareIntermeans_Click"/>
 
-             </MenuItem>
+            </MenuItem>
             <MenuItem Header="Filters">
                              
             </MenuItem>

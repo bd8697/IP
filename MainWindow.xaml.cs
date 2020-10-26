@@ -194,5 +194,30 @@ namespace ISIP_FrameworkGUI
             }
         }
 
+        private void Binarizare2P_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+                int T1 = 0;
+                int T2 = 0;
+                UserInputDialog dialog = new UserInputDialog("Coeficienti", new string[] { "T1", "T2" });
+                if (dialog.ShowDialog().Value == true)
+                {
+                    T1 = (int)dialog.Values[0];
+                    T2 = (int)dialog.Values[1];
+                }
+                mainControl.ProcessedGrayscaleImage = Tools.Binarizare(mainControl.OriginalGrayscaleImage, T1, T2);
+            }
+        }
+
+        private void BinarizareIntermeans_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+                double T = Tools.Thresholding(mainControl.OriginalGrayscaleImage);
+                mainControl.ProcessedGrayscaleImage = Tools.Binarizare(mainControl.OriginalGrayscaleImage, T);
+            }
+        }
+
     }
 }
