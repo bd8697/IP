@@ -57,14 +57,15 @@ namespace ISIP_Algorithms.Tools
         {
             for (int i = 0; i < table.Length; i++)
             {
-                Console.WriteLine(255 * Math.Pow(i, E) / (Math.Pow(i, E) + Math.Pow(m, E)) + c * i);
-                table[i] = (255 * Math.Pow(i, E) / (Math.Pow(i, E) + Math.Pow(m, E)) + c * i);
+               // Console.WriteLine(255 * Math.Pow(i, E) / (Math.Pow(i, E) + Math.Pow(m, E)) + c * i);
+                table[i] = 255 * (Math.Pow(i, E) / (Math.Pow(i, E) + Math.Pow(m, E)) + c * i);
             }
             return table;
         }
 
         public static double CalculateC(double E, double m)
         {
+
             return ((1 - (Math.Pow(255, E) / (Math.Pow(255, E) + Math.Pow(m, E)))) / 255);
         }
 
@@ -122,6 +123,10 @@ namespace ISIP_Algorithms.Tools
 
         public static double Thresholding(Image<Gray, byte> InputImage)
         {
+            double[] hist = new double[256];
+            double[] histRel = new double[256];
+            int nrPixeli = InputImage.Width * InputImage.Height;
+
             double T = 0; // prag
             double lastT = T + 1;
             int counter = 0;
@@ -130,38 +135,84 @@ namespace ISIP_Algorithms.Tools
             List<int> C2 = new List<int>();
             double m1 = 0;
             double m2 = 0;
+            double suma1_1 = 0;
+            double suma1_2 = 0;
+            double suma2_1 = 0;
+            double suma2_2 = 0;
 
+            for (int i = 0; i < hist.Length; i++)
+            {
+                hist[i] = 0;
+                histRel[i] = 0;
+            }
+
+            for (int y = 0; y < InputImage.Height; y++)
+            {
+                for (int x = 0; x < InputImage.Width; x++)
+                {
+                    hist[InputImage.Data[y, x, 0]]++;
+                }
+            }
+            for(int i = 0; i < hist.Length; i++)
+            {
+                histRel[i] = hist[i] / nrPixeli;
+            }
             //List<int> test = new List<int> { 1, 1, 1, 1, 10 };
             //Console.WriteLine(test.Average());
 
-            while (T != lastT && counter < 5000) 
+            T = Mid_range(InputImage);
+
+            while ((int)T != (int)lastT && counter < 5000)
             {
+                Console.WriteLine("t" + T);
                 counter++;
                 Console.WriteLine(counter);
-                for (int y = 0; y < InputImage.Height; y++)
+                //for (int y = 0; y < InputImage.Height; y++)
+                //{
+                //    for (int x = 0; x < InputImage.Width; x++)
+                //    {
+                //        if (InputImage.Data[y, x, 0] > T)
+                //        {
+                //            C1.Add(InputImage.Data[y, x, 0]);
+                //        }
+                //        else if (InputImage.Data[y, x, 0] <= T)
+                //        {
+                //            C2.Add(InputImage.Data[y, x, 0]);
+                //        }
+                //    }
+                //}
+
+                m1 = 0;
+                m2 = 0;
+                suma1_1 = 0;
+                suma1_2 = 0;
+                suma2_1 = 0;
+                suma2_2 = 0;
+
+                for (int y = 0; y < T; y++)
                 {
-                    for (int x = 0; x < InputImage.Width; x++)
-                    {
-                        if (InputImage.Data[y, x, 0] > T)
-                        {
-                            C1.Add(InputImage.Data[y, x, 0]);
-                        }
-                        else if (InputImage.Data[y, x, 0] <= T)
-                        {
-                            C2.Add(InputImage.Data[y, x, 0]);
-                        }
-                    }
+                    suma2_2 += histRel[y];
+                    suma2_1 += y * histRel[y];
                 }
 
-                m1 = C1.Average();
-                m2 = C2.Average();
-                C1.Clear();
-                C2.Clear();
+                for (int y = (int)T+1; y <= 255; y++)
+                {
+                    suma1_2 += histRel[y];
+                    suma1_1 += y * histRel[y];
+                }
 
+                m1 = suma1_1 / suma1_2;
+                m2 = suma2_1 / suma2_2;
+
+                //m1 = C1.Average();
+                //m2 = C2.Average();
+                //C1.Clear();
+                //C2.Clear();
+
+                Console.WriteLine(m1 + "m1");
                 lastT = T;
                 T = (m1 + m2) / 2;
             }
-
             return T;
         }
 
@@ -186,6 +237,144 @@ namespace ISIP_Algorithms.Tools
             }
             // Console.WriteLine((byte)((min + max) / 2));
             return (byte)((min + max) / 2);
+        }
+
+
+        // Tema 4
+
+        private static int[] PascalTriangle(int n)
+        {
+            int[] arr = new int[n];
+            int currElem = 0;
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j <= i; j++)
+                {
+                    if (j == 0 || i == 0)
+                        currElem = 1;
+                    else
+                        currElem = currElem * (i - j + 1) / j;
+                    Console.Write(currElem + " ");
+                    if (i == n - 1)
+                    {
+                        arr[j] = currElem;
+                    }
+                }
+                Console.WriteLine();
+            }
+            return arr;
+        }
+
+        private static double[,] GetMask(int n)
+        {
+            double c = 0;
+            int[] arr = new int[n];
+            arr = PascalTriangle(n);
+            int[,] arrT = new int[1, n];
+            double[,] mask = new double[n, n];
+
+            for(int j = 0; j < n; j++)
+            {
+                arrT[0, j] = arr[j];
+            }
+
+            //for (int i = 0; i < n; i++)
+            //{
+            //    Console.WriteLine(arrT[0, i]);
+            //}
+            for (int i = 0; i < n; i++) 
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    mask[i, j] = arr[i] * arrT[0, j];
+                    c += mask[i, j];
+                }
+            }
+
+            Console.WriteLine(c);
+
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    Console.Write(mask[i, j] + " ");
+                    mask[i, j] /= c;
+                }
+                Console.WriteLine();
+            }
+
+            return mask;
+        }
+
+        public static Image<Gray, byte> BinomialFilterG (Image<Gray, byte> InputImage, int n)
+        {
+            if (n % 2 != 0)
+                n -= 1;
+
+            double[,] mask = new double[n, n];
+            mask = GetMask(n);
+
+            Image<Gray, byte> Result = new Image<Gray, byte>(InputImage.Size);
+
+            for (int y = 0; y < InputImage.Height; y++)
+            {
+                for (int x = 0; x < InputImage.Width; x++)
+                {
+                    if(y < n / 2 || y >= InputImage.Height - n / 2 || x < n / 2 || x >= InputImage.Height - n / 2)
+                    {
+                        Result.Data[y, x, 0] = InputImage.Data[y, x, 0];
+                    } else
+                    {
+                        for (int k = -n / 2; k < n / 2; k++)
+                        {
+                            for (int l = -n / 2; l < n / 2; l++)
+                            {
+                                Result.Data[y, x, 0] += (byte)(mask[k + n / 2, l + n / 2] * InputImage.Data[y + l, x + k, 0]);
+                            }
+                        }
+                    }
+                }
+            }
+            return Result;
+        }
+
+        public static Image<Bgr, byte> BinomialFilterRGB(Image<Bgr, byte> InputImage, int n)
+        {
+            if (n % 2 != 0)
+                n -= 1;
+
+            double[,] mask = new double[n, n];
+            mask = GetMask(n);
+
+            Image<Bgr, byte> Result = new Image<Bgr, byte>(InputImage.Size);
+
+            for (int y = 0; y < InputImage.Height; y++)
+            {
+                for (int x = 0; x < InputImage.Width; x++)
+                {
+                    if (y < n / 2 || y >= InputImage.Height - n / 2 || x < n / 2 || x >= InputImage.Height - n / 2)
+                    {
+                        for(int ch = 0; ch < 3; ch++)
+                        {
+                            Result.Data[y, x, ch] = InputImage.Data[y, x, ch];
+                        }
+                    }
+                    else
+                    {
+                        for (int k = -n / 2; k < n / 2; k++)
+                        {
+                            for (int l = -n / 2; l < n / 2; l++)
+                            {
+                                for (int ch = 0; ch < 3; ch++)
+                                {
+                                    Result.Data[y, x, ch] += (byte)(mask[k + n / 2, l + n / 2] * InputImage.Data[y + l, x + k, ch]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return Result;
         }
     }
 }

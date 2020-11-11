@@ -30,6 +30,8 @@
                 <MenuItem Header="Modificare Contrast" Click="Contrast_Click"/>
                 <MenuItem Header="Binarizare2P" Click="Binarizare2P_Click"/>
                 <MenuItem Header="BinarizareIntermeans" Click="BinarizareIntermeans_Click"/>
+                <MenuItem Header="BinomialFilterG" Click="BinomialFilterG_Click"/>
+                <MenuItem Header="BinomialFilterRGB" Click="BinomialFilterRGB_Click"/>
 
             </MenuItem>
             <MenuItem Header="Filters">

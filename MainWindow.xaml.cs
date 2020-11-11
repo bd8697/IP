@@ -219,5 +219,32 @@ namespace ISIP_FrameworkGUI
             }
         }
 
+        private void BinomialFilterG_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+                int n = 0;
+                UserInputDialog dialog = new UserInputDialog("BinomialFilterG", new string[] { "n" });
+                if (dialog.ShowDialog().Value == true)
+                {
+                    n = (int)dialog.Values[0];
+                }
+                mainControl.ProcessedGrayscaleImage = Tools.BinomialFilterG(mainControl.OriginalGrayscaleImage, n);
+            }
+        }
+
+        private void BinomialFilterRGB_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainControl.OriginalColorImage != null)
+            {
+                int n = 0;
+                UserInputDialog dialog = new UserInputDialog("BinomialFilterRGB", new string[] { "n" });
+                if (dialog.ShowDialog().Value == true)
+                {
+                    n = (int)dialog.Values[0];
+                }
+                mainControl.ProcessedColorImage = Tools.BinomialFilterRGB(mainControl.OriginalColorImage, n);
+            }
+        }
     }
 }
