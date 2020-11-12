@@ -376,5 +376,59 @@ namespace ISIP_Algorithms.Tools
             }
             return Result;
         }
+
+        // Tema 5
+
+        public static Image<Gray, byte> HorizontalSobel(Image<Gray, byte> InputImage, int t)
+        {
+            Image<Gray, byte> Result = new Image<Gray, byte>(InputImage.Size);
+            float fx = 0;
+            float fy = 0;
+            double norma = 0;
+            double dir = 0;
+            double deg = 0;
+            int degThreshold = 25;
+
+            for (int y = 0; y < InputImage.Height; y++)
+            {
+                for (int x = 0; x < InputImage.Width; x++)
+                {
+                    if (y < 1 || y >= InputImage.Height - 1 || x < 1 || x >= InputImage.Width - 1)
+                    {
+                        Result.Data[y, x, 0] = InputImage.Data[y, x, 0];
+                    }
+                    else
+                    {
+                        fx = InputImage.Data[y - 1, x + 1, 0] - InputImage.Data[y - 1, x - 1, 0] + 2 * InputImage.Data[y, x + 1, 0] -2 * InputImage.Data[y, x - 1, 0] + InputImage.Data[y + 1, x + 1, 0] - InputImage.Data[y + 1, x - 1, 0];
+                        fy = InputImage.Data[y + 1, x - 1, 0] - InputImage.Data[y - 1, x - 1, 0] + 2 * InputImage.Data[y + 1, x, 0] - 2 * InputImage.Data[y - 1, x, 0] + InputImage.Data[y + 1, x + 1, 0] - InputImage.Data[y - 1, x + 1, 0];
+
+                        norma = Math.Sqrt((fx * fx) + (fy * fy));
+
+                        //dir = Math.Atan2(fx, fy);
+
+                        //if (norma >= t && Math.Abs(dir) > 2f)
+                        //{
+                        //    Result.Data[y, x, 0] = (byte)(255);
+                        //}
+                        //else
+                        //{
+                        //    Result.Data[y, x, 0] = (byte)(0);
+                        //}
+                        dir = Math.Atan2(fy, fx);
+                        deg = (180 / Math.PI) * dir;
+
+                        if (norma >= t && (Math.Abs(deg) >= 90 - degThreshold && Math.Abs(deg) <= 90 + degThreshold))
+                        {
+                            Result.Data[y, x, 0] = (byte)(255);
+                        }
+                        else
+                        {
+                            Result.Data[y, x, 0] = (byte)(0);
+                        }
+                    }
+                }
+            }
+            return Result;
+        }
     }
 }

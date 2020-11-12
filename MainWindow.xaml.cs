@@ -246,5 +246,19 @@ namespace ISIP_FrameworkGUI
                 mainControl.ProcessedColorImage = Tools.BinomialFilterRGB(mainControl.OriginalColorImage, n);
             }
         }
+
+        private void HorizontalSobel_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+                int t = 0;
+                UserInputDialog dialog = new UserInputDialog("HorSobel", new string[] { "t" });
+                if (dialog.ShowDialog().Value == true)
+                {
+                    t = (int)dialog.Values[0];
+                }
+                mainControl.ProcessedGrayscaleImage = Tools.HorizontalSobel(mainControl.OriginalGrayscaleImage, t);
+            }
+        }
     }
 }
