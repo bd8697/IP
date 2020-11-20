@@ -57,7 +57,7 @@ namespace ISIP_Algorithms.Tools
         {
             for (int i = 0; i < table.Length; i++)
             {
-               // Console.WriteLine(255 * Math.Pow(i, E) / (Math.Pow(i, E) + Math.Pow(m, E)) + c * i);
+                // Console.WriteLine(255 * Math.Pow(i, E) / (Math.Pow(i, E) + Math.Pow(m, E)) + c * i);
                 table[i] = 255 * (Math.Pow(i, E) / (Math.Pow(i, E) + Math.Pow(m, E)) + c * i);
             }
             return table;
@@ -153,7 +153,7 @@ namespace ISIP_Algorithms.Tools
                     hist[InputImage.Data[y, x, 0]]++;
                 }
             }
-            for(int i = 0; i < hist.Length; i++)
+            for (int i = 0; i < hist.Length; i++)
             {
                 histRel[i] = hist[i] / nrPixeli;
             }
@@ -195,7 +195,7 @@ namespace ISIP_Algorithms.Tools
                     suma2_1 += y * histRel[y];
                 }
 
-                for (int y = (int)T+1; y <= 255; y++)
+                for (int y = (int)T + 1; y <= 255; y++)
                 {
                     suma1_2 += histRel[y];
                     suma1_1 += y * histRel[y];
@@ -272,17 +272,16 @@ namespace ISIP_Algorithms.Tools
             arr = PascalTriangle(n);
             int[,] arrT = new int[1, n];
             double[,] mask = new double[n, n];
-
-            for(int j = 0; j < n; j++)
+            for (int j = 0; j < n; j++)
             {
                 arrT[0, j] = arr[j];
             }
 
-            //for (int i = 0; i < n; i++)
-            //{
-            //    Console.WriteLine(arrT[0, i]);
-            //}
-            for (int i = 0; i < n; i++) 
+            for (int i = 0; i < n; i++)
+            {
+                Console.WriteLine(arrT[0, i] + " arr");
+            }
+            for (int i = 0; i < n; i++)
             {
                 for (int j = 0; j < n; j++)
                 {
@@ -306,32 +305,35 @@ namespace ISIP_Algorithms.Tools
             return mask;
         }
 
-        public static Image<Gray, byte> BinomialFilterG (Image<Gray, byte> InputImage, int n)
+        public static Image<Gray, byte> BinomialFilterG(Image<Gray, byte> InputImage, int n)
         {
-            if (n % 2 != 0)
+            if (n % 2 == 0)
                 n -= 1;
 
             double[,] mask = new double[n, n];
             mask = GetMask(n);
-
+            double val = 0;
             Image<Gray, byte> Result = new Image<Gray, byte>(InputImage.Size);
 
             for (int y = 0; y < InputImage.Height; y++)
             {
                 for (int x = 0; x < InputImage.Width; x++)
                 {
-                    if(y < n / 2 || y >= InputImage.Height - n / 2 || x < n / 2 || x >= InputImage.Height - n / 2)
+                    if (y < n / 2 || y >= InputImage.Height - n / 2 || x < n / 2 || x >= InputImage.Height - n / 2)
                     {
                         Result.Data[y, x, 0] = InputImage.Data[y, x, 0];
-                    } else
+                    }
+                    else
                     {
-                        for (int k = -n / 2; k < n / 2; k++)
+                        val = 0;
+                        for (int k = -n / 2; k <= n / 2; k++)
                         {
-                            for (int l = -n / 2; l < n / 2; l++)
+                            for (int l = -n / 2; l <= n / 2; l++)
                             {
-                                Result.Data[y, x, 0] += (byte)(mask[k + n / 2, l + n / 2] * InputImage.Data[y + l, x + k, 0]);
+                                val += (double)(mask[k + n / 2, l + n / 2] * InputImage.Data[y + l, x + k, 0]);
                             }
                         }
+                        Result.Data[y, x, 0] = (byte)(val + 0.5f);
                     }
                 }
             }
@@ -342,6 +344,7 @@ namespace ISIP_Algorithms.Tools
         {
             if (n % 2 != 0)
                 n -= 1;
+
 
             double[,] mask = new double[n, n];
             mask = GetMask(n);
@@ -354,7 +357,7 @@ namespace ISIP_Algorithms.Tools
                 {
                     if (y < n / 2 || y >= InputImage.Height - n / 2 || x < n / 2 || x >= InputImage.Height - n / 2)
                     {
-                        for(int ch = 0; ch < 3; ch++)
+                        for (int ch = 0; ch < 3; ch++)
                         {
                             Result.Data[y, x, ch] = InputImage.Data[y, x, ch];
                         }
@@ -399,7 +402,7 @@ namespace ISIP_Algorithms.Tools
                     }
                     else
                     {
-                        fx = InputImage.Data[y - 1, x + 1, 0] - InputImage.Data[y - 1, x - 1, 0] + 2 * InputImage.Data[y, x + 1, 0] -2 * InputImage.Data[y, x - 1, 0] + InputImage.Data[y + 1, x + 1, 0] - InputImage.Data[y + 1, x - 1, 0];
+                        fx = InputImage.Data[y - 1, x + 1, 0] - InputImage.Data[y - 1, x - 1, 0] + 2 * InputImage.Data[y, x + 1, 0] - 2 * InputImage.Data[y, x - 1, 0] + InputImage.Data[y + 1, x + 1, 0] - InputImage.Data[y + 1, x - 1, 0];
                         fy = InputImage.Data[y + 1, x - 1, 0] - InputImage.Data[y - 1, x - 1, 0] + 2 * InputImage.Data[y + 1, x, 0] - 2 * InputImage.Data[y - 1, x, 0] + InputImage.Data[y + 1, x + 1, 0] - InputImage.Data[y - 1, x + 1, 0];
 
                         norma = Math.Sqrt((fx * fx) + (fy * fy));
@@ -426,6 +429,111 @@ namespace ISIP_Algorithms.Tools
                             Result.Data[y, x, 0] = (byte)(0);
                         }
                     }
+                }
+            }
+            return Result;
+        }
+
+        // Tema 6
+
+        public static Image<Gray, byte> Closing(Image<Gray, byte> InputImage, int n)
+        {
+            return Erodare(Dilatare(InputImage, n), n);
+        }
+
+        private static Image<Gray, byte> Dilatare(Image<Gray, byte> InputImage, int n)
+        {
+            Image<Gray, byte> Result = new Image<Gray, byte>(InputImage.Size);
+            int width = InputImage.Width;
+            int height = InputImage.Height;
+
+            for (int y = 0; y < InputImage.Height; y++)
+            {
+                for (int x = 0; x < InputImage.Width; x++)
+                {
+                    //if (y < n / 2 || y >= InputImage.Height - n / 2 || x < n / 2 || x >= InputImage.Width - n / 2)
+                    //{
+                    //    Result.Data[y, x, 0] = InputImage.Data[y, x, 0];
+                    //}
+                    //else
+                    //{
+                        if(InputImage.Data[y, x, 0] == 0)
+                        {
+                            bool hasWhiteNeighbour = false;
+                            for (int k = -n / 2; k <= n / 2; k++)
+                            {
+                                for (int l = -n / 2; l <= n / 2; l++)
+                                {
+                                if( y+l >= 0 && y+l < height && x+k >= 0 && x+k < width)
+                                    if (InputImage.Data[y + l, x + k, 0] == 255)
+                                    {
+                                        Result.Data[y, x, 0] = 255;
+                                        hasWhiteNeighbour = true;
+                                        break;
+                                    }
+                                }
+                                if (hasWhiteNeighbour)
+                                    break;
+                            }
+                            //if (hasWhiteNeighbour)
+                            //{
+                            //    Result.Data[y, x, 0] = 255;
+                            //}
+                            //else
+                            //{
+                            //    Result.Data[y, x, 0] = 0;
+                            //}
+                        } else
+                        {
+                            Result.Data[y, x, 0] = 255;
+                        }
+                   // }
+                }
+            }
+            return Result;
+        }
+
+        private static Image<Gray, byte> Erodare(Image<Gray, byte> InputImage, int n)
+        {
+            Image<Gray, byte> Result = new Image<Gray, byte>(InputImage.Size);
+            int width = InputImage.Width;
+            int height = InputImage.Height;
+
+            for (int y = 0; y < InputImage.Height; y++)
+            {
+                for (int x = 0; x < InputImage.Width; x++)
+                {
+                        if (InputImage.Data[y, x, 0] == 255)
+                        {
+                            bool hasBlackNeighbour = false;
+                            for (int k = -n / 2; k <= n / 2; k++)
+                            {
+                                for (int l = -n / 2; l <= n / 2; l++)
+                                {
+                                if (y + l >= 0 && y + l < height && x + k >= 0 && x + k < width)
+                                    if (InputImage.Data[y + l, x + k, 0] == 0)
+                                    {
+                                        //  Result.Data[y, x, 0] = 0;
+                                        hasBlackNeighbour = true;
+                                        break;
+                                    }
+                                }
+                                if (hasBlackNeighbour)
+                                    break;
+                            }
+                            if (hasBlackNeighbour)
+                            {
+                                Result.Data[y, x, 0] = 0;
+                            }
+                            else
+                            {
+                                Result.Data[y, x, 0] = 255;
+                            }
+                        }
+                        else
+                        {
+                            Result.Data[y, x, 0] = 0;
+                        }
                 }
             }
             return Result;

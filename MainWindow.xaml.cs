@@ -260,5 +260,19 @@ namespace ISIP_FrameworkGUI
                 mainControl.ProcessedGrayscaleImage = Tools.HorizontalSobel(mainControl.OriginalGrayscaleImage, t);
             }
         }
+
+        private void Closing_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+                int n = 0;
+                UserInputDialog dialog = new UserInputDialog("Closing", new string[] { "n" });
+                if (dialog.ShowDialog().Value == true)
+                {
+                    n = (int)dialog.Values[0];
+                }
+                mainControl.ProcessedGrayscaleImage = Tools.Closing(mainControl.OriginalGrayscaleImage, n);
+            }
+        }
     }
 }

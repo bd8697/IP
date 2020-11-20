@@ -33,6 +33,7 @@
                 <MenuItem Header="BinomialFilterG" Click="BinomialFilterG_Click"/>
                 <MenuItem Header="BinomialFilterRGB" Click="BinomialFilterRGB_Click"/>
                 <MenuItem Header="HorizontalSobel" Click="HorizontalSobel_Click"/>
+                <MenuItem Header="Closing" Click="Closing_Click"/>
 
             </MenuItem>
             <MenuItem Header="Filters">
