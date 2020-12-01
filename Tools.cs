@@ -457,37 +457,38 @@ namespace ISIP_Algorithms.Tools
                     //}
                     //else
                     //{
-                        if(InputImage.Data[y, x, 0] == 0)
+                    if (InputImage.Data[y, x, 0] == 0)
+                    {
+                        bool hasWhiteNeighbour = false;
+                        for (int k = -n / 2; k <= n / 2; k++)
                         {
-                            bool hasWhiteNeighbour = false;
-                            for (int k = -n / 2; k <= n / 2; k++)
+                            for (int l = -n / 2; l <= n / 2; l++)
                             {
-                                for (int l = -n / 2; l <= n / 2; l++)
-                                {
-                                if( y+l >= 0 && y+l < height && x+k >= 0 && x+k < width)
+                                if (y + l >= 0 && y + l < height && x + k >= 0 && x + k < width)
                                     if (InputImage.Data[y + l, x + k, 0] == 255)
                                     {
                                         Result.Data[y, x, 0] = 255;
                                         hasWhiteNeighbour = true;
                                         break;
                                     }
-                                }
-                                if (hasWhiteNeighbour)
-                                    break;
                             }
-                            //if (hasWhiteNeighbour)
-                            //{
-                            //    Result.Data[y, x, 0] = 255;
-                            //}
-                            //else
-                            //{
-                            //    Result.Data[y, x, 0] = 0;
-                            //}
-                        } else
-                        {
-                            Result.Data[y, x, 0] = 255;
+                            if (hasWhiteNeighbour)
+                                break;
                         }
-                   // }
+                        //if (hasWhiteNeighbour)
+                        //{
+                        //    Result.Data[y, x, 0] = 255;
+                        //}
+                        //else
+                        //{
+                        //    Result.Data[y, x, 0] = 0;
+                        //}
+                    }
+                    else
+                    {
+                        Result.Data[y, x, 0] = 255;
+                    }
+                    // }
                 }
             }
             return Result;
@@ -503,13 +504,13 @@ namespace ISIP_Algorithms.Tools
             {
                 for (int x = 0; x < InputImage.Width; x++)
                 {
-                        if (InputImage.Data[y, x, 0] == 255)
+                    if (InputImage.Data[y, x, 0] == 255)
+                    {
+                        bool hasBlackNeighbour = false;
+                        for (int k = -n / 2; k <= n / 2; k++)
                         {
-                            bool hasBlackNeighbour = false;
-                            for (int k = -n / 2; k <= n / 2; k++)
+                            for (int l = -n / 2; l <= n / 2; l++)
                             {
-                                for (int l = -n / 2; l <= n / 2; l++)
-                                {
                                 if (y + l >= 0 && y + l < height && x + k >= 0 && x + k < width)
                                     if (InputImage.Data[y + l, x + k, 0] == 0)
                                     {
@@ -517,23 +518,78 @@ namespace ISIP_Algorithms.Tools
                                         hasBlackNeighbour = true;
                                         break;
                                     }
-                                }
-                                if (hasBlackNeighbour)
-                                    break;
                             }
                             if (hasBlackNeighbour)
-                            {
-                                Result.Data[y, x, 0] = 0;
-                            }
-                            else
-                            {
-                                Result.Data[y, x, 0] = 255;
-                            }
+                                break;
                         }
-                        else
+                        if (hasBlackNeighbour)
                         {
                             Result.Data[y, x, 0] = 0;
                         }
+                        else
+                        {
+                            Result.Data[y, x, 0] = 255;
+                        }
+                    }
+                    else
+                    {
+                        Result.Data[y, x, 0] = 0;
+                    }
+                }
+            }
+            return Result;
+        }
+
+        // Tema 7
+
+        public static Image<Gray, byte> BilinearInterpolationScale(Image<Gray, byte> InputImage, float coef, System.Windows.Point lastClick)
+        {
+            double xc, yc = 0f;
+            int x0, y0, x1, y1 = 0; 
+            double fy0, fy1, fc = 0f;
+            double offsetX = lastClick.X * coef;
+            double offsetY = lastClick.Y * coef;
+            int offsetScaleDownX = 0;
+            int offsetScaleDownY = 0;
+
+            if (coef < 1f)
+            {
+                offsetScaleDownX = (int)(InputImage.Width * coef);
+                offsetScaleDownX = (InputImage.Width - offsetScaleDownX) / 2;
+                offsetScaleDownY = (int)(InputImage.Height * coef);
+                offsetScaleDownY = (InputImage.Height - offsetScaleDownY) / 2;
+
+                offsetX = 0;
+                offsetY = 0;
+            }
+
+            Image<Gray, byte> Result = new Image<Gray, byte>(InputImage.Size);
+
+            for (int y = 0; y < Result.Height; y++)
+            {
+                for (int x = 0; x < Result.Width; x++)
+                {
+                    xc = (double)(x + offsetX - offsetScaleDownX) / coef;
+                    yc = (double)(y + offsetY - offsetScaleDownY) / coef;
+
+                    if (xc < Result.Width - 1 && xc >= 0 && yc >= 0 && yc < Result.Height - 1)
+                    {
+                        x0 = (int)xc;
+                        y0 = (int)yc;
+                        x1 = x0 + 1;
+                        y1 = y0 + 1;
+                        // x0 <= xc <= x1
+
+                        fy0 = (InputImage.Data[y0, x0 + 1, 0] - InputImage.Data[y0, x0, 0]) * (xc - x0) + InputImage.Data[y0, x0, 0];
+                        fy1 = (InputImage.Data[y0 + 1, x0 + 1, 0] - InputImage.Data[y0 + 1, x0, 0]) * (xc - x0) + InputImage.Data[y0 + 1, x0, 0];
+                        fc = (fy1 - fy0) * (yc - y0) + fy0;
+
+                        Result.Data[y, x, 0] = (byte)fc;
+                    }
+                    else
+                    {
+                        Result.Data[y, x, 0] = 0;
+                    }
                 }
             }
             return Result;

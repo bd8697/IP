@@ -34,6 +34,7 @@
                 <MenuItem Header="BinomialFilterRGB" Click="BinomialFilterRGB_Click"/>
                 <MenuItem Header="HorizontalSobel" Click="HorizontalSobel_Click"/>
                 <MenuItem Header="Closing" Click="Closing_Click"/>
+                <MenuItem Header="BilinearInterpolationScale" Click="BilinearInterpolationScale_Click"/>
 
             </MenuItem>
             <MenuItem Header="Filters">

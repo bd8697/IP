@@ -274,5 +274,19 @@ namespace ISIP_FrameworkGUI
                 mainControl.ProcessedGrayscaleImage = Tools.Closing(mainControl.OriginalGrayscaleImage, n);
             }
         }
+            private void BilinearInterpolationScale_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+                float c = 0;
+                UserInputDialog dialog = new UserInputDialog("InterpolationScale", new string[] { "coef" });
+                if (dialog.ShowDialog().Value == true)
+                {
+                    c = (float)dialog.Values[0];
+                }
+                mainControl.ProcessedGrayscaleImage = Tools.BilinearInterpolationScale(mainControl.OriginalGrayscaleImage, c, lastClick);
+            }
+        }
+
     }
 }
