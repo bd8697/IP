@@ -35,6 +35,7 @@
                 <MenuItem Header="HorizontalSobel" Click="HorizontalSobel_Click"/>
                 <MenuItem Header="Closing" Click="Closing_Click"/>
                 <MenuItem Header="BilinearInterpolationScale" Click="BilinearInterpolationScale_Click"/>
+                <MenuItem Header="Transformare Hough" Click="TransformareHough_Click"/>
 
             </MenuItem>
             <MenuItem Header="Filters">

@@ -288,5 +288,28 @@ namespace ISIP_FrameworkGUI
             }
         }
 
+        private void TransformareHough_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainControl.OriginalGrayscaleImage != null)
+            {
+                mainControl.ProcessedGrayscaleImage = Tools.HoughTransform2(mainControl.OriginalGrayscaleImage);
+            }
+            DrawLines();
+        }
+
+        private void DrawLines()
+        {
+            foreach(Tuple<System.Windows.Point, System.Windows.Point> line in Tools.GetLines())
+            {
+                Console.WriteLine(line.Item1 + " " + line.Item2);
+                DrawLine(line.Item1, line.Item2);
+            }
+        }
+
+        public void DrawLine(System.Windows.Point from, System.Windows.Point to)
+        {
+            DrawHelper.DrawAndGetLine(mainControl.OriginalImageCanvas, from, to, System.Windows.Media.Brushes.Red, 3);
+        }
+
     }
 }

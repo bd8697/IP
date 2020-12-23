@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ISIP_FrameworkHelpers;
+using System.Windows;
 
 using Emgu.CV;
 using Emgu.CV.Structure;
@@ -9,6 +11,8 @@ namespace ISIP_Algorithms.Tools
 {
     public class Tools
     {
+        private static List<Tuple<System.Windows.Point, System.Windows.Point>> lines = new List<Tuple<System.Windows.Point, System.Windows.Point>>();
+
         public static Image<Gray, byte> Invert(Image<Gray, byte> InputImage)
         {
             Image<Gray, byte> Result = new Image<Gray, byte>(InputImage.Size);
@@ -164,9 +168,9 @@ namespace ISIP_Algorithms.Tools
 
             while ((int)T != (int)lastT && counter < 5000)
             {
-                Console.WriteLine("t" + T);
+                // Console.WriteLine("t" + T);
                 counter++;
-                Console.WriteLine(counter);
+                //  Console.WriteLine(counter);
                 //for (int y = 0; y < InputImage.Height; y++)
                 //{
                 //    for (int x = 0; x < InputImage.Width; x++)
@@ -209,7 +213,7 @@ namespace ISIP_Algorithms.Tools
                 //C1.Clear();
                 //C2.Clear();
 
-                Console.WriteLine(m1 + "m1");
+                // Console.WriteLine(m1 + "m1");
                 lastT = T;
                 T = (m1 + m2) / 2;
             }
@@ -254,13 +258,13 @@ namespace ISIP_Algorithms.Tools
                         currElem = 1;
                     else
                         currElem = currElem * (i - j + 1) / j;
-                    Console.Write(currElem + " ");
+                    //  Console.Write(currElem + " ");
                     if (i == n - 1)
                     {
                         arr[j] = currElem;
                     }
                 }
-                Console.WriteLine();
+                //  Console.WriteLine();
             }
             return arr;
         }
@@ -279,7 +283,7 @@ namespace ISIP_Algorithms.Tools
 
             for (int i = 0; i < n; i++)
             {
-                Console.WriteLine(arrT[0, i] + " arr");
+                // Console.WriteLine(arrT[0, i] + " arr");
             }
             for (int i = 0; i < n; i++)
             {
@@ -290,16 +294,16 @@ namespace ISIP_Algorithms.Tools
                 }
             }
 
-            Console.WriteLine(c);
+            // Console.WriteLine(c);
 
             for (int i = 0; i < n; i++)
             {
                 for (int j = 0; j < n; j++)
                 {
-                    Console.Write(mask[i, j] + " ");
+                    // Console.Write(mask[i, j] + " ");
                     mask[i, j] /= c;
                 }
-                Console.WriteLine();
+                // Console.WriteLine();
             }
 
             return mask;
@@ -390,7 +394,7 @@ namespace ISIP_Algorithms.Tools
             double norma = 0;
             double dir = 0;
             double deg = 0;
-            int degThreshold = 25;
+            int degThreshold = 5;
 
             for (int y = 0; y < InputImage.Height; y++)
             {
@@ -545,7 +549,7 @@ namespace ISIP_Algorithms.Tools
         public static Image<Gray, byte> BilinearInterpolationScale(Image<Gray, byte> InputImage, float coef, System.Windows.Point lastClick)
         {
             double xc, yc = 0f;
-            int x0, y0, x1, y1 = 0; 
+            int x0, y0, x1, y1 = 0;
             double fy0, fy1, fc = 0f;
             double offsetX = lastClick.X * coef;
             double offsetY = lastClick.Y * coef;
@@ -594,5 +598,164 @@ namespace ISIP_Algorithms.Tools
             }
             return Result;
         }
+
+        // Tema 8
+
+        public static Image<Gray, byte> HoughTransform(Image<Gray, byte> InputImage)
+        {
+            int houghWidth = (int)Math.Ceiling(Math.Sqrt(InputImage.Width * InputImage.Width + InputImage.Height * InputImage.Height));
+            int houghHeight = 181;
+
+            var size = InputImage.Size;
+            size.Width = houghWidth * 2;
+            size.Height = houghHeight;
+            Image<Gray, byte> Result = new Image<Gray, byte>(size);
+
+            double r = 0;
+            int maxim = 0;
+
+            //hough: axa Y: -90 -> 90, axa X: -diag -> diag
+
+            List<List<int>> hough = new List<List<int>>();
+
+            for (int i = 0; i < houghHeight; i++)
+            {
+                hough.Add(new List<int>());
+                for (int j = -houghWidth; j <= houghWidth; j++)
+                {
+                    hough[i].Add(0);
+                }
+            }
+
+            for (int y = 0; y < InputImage.Height; y++)
+            {
+                for (int x = 0; x < InputImage.Width; x++)
+                {
+                    if (InputImage.Data[y, x, 0] > 0)
+                    {
+                        Console.WriteLine();
+                        for (int theta = -90; theta <= 90; theta++)
+                        {
+                            r = x * Math.Cos(theta) + y * Math.Sin(theta);
+                            //Console.WriteLine(r);
+                            int auxAcc = hough[theta + 90][(int)r + houghWidth]++;
+                            Console.Write(auxAcc + " ");
+                            if (auxAcc > maxim)
+                            {
+                                maxim = auxAcc;
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < houghHeight; i++)
+            {
+                for (int j = 0; j < houghWidth * 2; j++)
+                {
+                    Result.Data[i, j, 0] = (byte)hough[i][j];
+                }
+            }
+
+            //print haugh
+            for (int i = 0; i < hough.Count; i++)
+            {
+                Console.WriteLine();
+                for (int j = 0; j < hough[0].Count; j++)
+                {
+                    Console.Write(hough[i][j] + " ");
+                }
+            }
+            return Result;
+        }
+
+        public static Image<Gray, byte> HoughTransform2(Image<Gray, byte> InputImage)
+        {
+            lines.Add(new Tuple<System.Windows.Point, System.Windows.Point>(new System.Windows.Point(10, 20), new System.Windows.Point(40, 50)));
+            int houghHeight = (int)Math.Ceiling(Math.Sqrt(InputImage.Width * InputImage.Width + InputImage.Height * InputImage.Height));
+            int houghWidth = 181;
+
+            var size = InputImage.Size;
+            size.Height = houghHeight * 2;
+            size.Width = houghWidth;
+            Image<Gray, byte> Result = new Image<Gray, byte>(size);
+
+            double r = 0;
+            int maxim = 0;
+            int edgeSelectionThreshold = 5;
+
+            // result -> input
+            int x0 = 0;
+            int x1 = InputImage.Width;
+
+            //hough: axa Y: -90 -> 90, axa X: -diag -> diag
+
+            List<List<int>> hough = new List<List<int>>();
+
+            for (int i = 0; i < houghHeight * 2; i++)
+            {
+                hough.Add(new List<int>());
+                for (int j = 0; j <= 180; j++)
+                {
+                    hough[i].Add(0);
+                }
+            }
+
+            for (int y = 0; y < InputImage.Height; y++)
+            {
+                for (int x = 0; x < InputImage.Width; x++)
+                {
+                    if (InputImage.Data[y, x, 0] > 0)
+                    {
+                        // Console.WriteLine();
+                        for (int theta = -90; theta <= 90; theta++)
+                        {
+                            double thetaRad = (Math.PI / 180) * theta;
+                            r = x * Math.Cos(thetaRad) + y * Math.Sin(thetaRad);
+                            //Console.WriteLine(r);
+                            int auxAcc = hough[(int)r + houghHeight][theta + 90]++;
+                            // Console.Write(auxAcc + " ");
+                            if (auxAcc > maxim)
+                            {
+                                maxim = auxAcc;
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < houghHeight * 2; i++) // i = rho, j = theta
+            {
+                for (int j = 0; j < houghWidth; j++)
+                {
+                    Result.Data[i, j, 0] = (byte)hough[i][j];
+                    if (hough[i][j] >= maxim - edgeSelectionThreshold)
+                    {
+                        double thetaRad = (Math.PI / 180) * (j + 1);
+                        int y0 = (int)(- Math.Cos(thetaRad) / Math.Sin(thetaRad) * x0 + ((i + 1) / Math.Sin(thetaRad)));
+                        int y1 = (int)(- Math.Cos(thetaRad) / Math.Sin(thetaRad) * x1 + ((i + 1) / Math.Sin(thetaRad)));
+
+                        lines.Add(new Tuple<System.Windows.Point, System.Windows.Point>(new System.Windows.Point(x0, y0), new System.Windows.Point(x1, y1)));
+                    }
+                }
+            }
+            Console.WriteLine(maxim);
+
+            //print haugh
+            for (int i = 0; i < hough.Count; i++)
+            {
+                Console.WriteLine();
+                for (int j = 0; j < hough[0].Count; j++)
+                {
+                    Console.Write(hough[i][j] + " ");
+                }
+            }
+            return Result;
+        }
+
+        public static List<Tuple<System.Windows.Point, System.Windows.Point>> GetLines() {
+                return lines;
+            }
+
     }
 }
